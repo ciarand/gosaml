@@ -19,12 +19,12 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/nu7hatch/gouuid"
-	"net/url"
-	"time"
 	"io/ioutil"
-	"os/exec"
+	"net/url"
 	"os"
+	"os/exec"
 	"strings"
+	"time"
 )
 
 func NewAuthorizationRequest(appSettings AppSettings, accountSettings AccountSettings) *AuthorizationRequest {
@@ -33,8 +33,10 @@ func NewAuthorizationRequest(appSettings AppSettings, accountSettings AccountSet
 		fmt.Println("Error is UUID Generation:", err)
 	}
 	//yyyy-MM-dd'T'H:mm:ss
-	layout := "2006-01-02T15:04:05"
-	t := time.Now().Format(layout)
+	//layout := "2006-01-02T15:04:05"
+	//layout := "2014-12-04T21:13:49Z"
+	//t := time.Now().Format(layout)
+	t := time.Now().UTC().Format(time.RFC3339Nano)
 
 	return &AuthorizationRequest{AccountSettings: accountSettings, AppSettings: appSettings, Id: "_" + myIdUUID.String(), IssueInstant: t}
 }
@@ -56,7 +58,8 @@ func (ar AuthorizationRequest) GetRequest(base64Encode bool) (string, error) {
 			XMLName: xml.Name{
 				Local: "saml:Issuer",
 			},
-			Url: "https://sp.example.com/SAML2",
+			Url:  ar.AppSettings.Issuer,
+			SAML: "urn:oasis:names:tc:SAML:2.0:assertion",
 		},
 		IssueInstant: ar.IssueInstant,
 		NameIDPolicy: NameIDPolicy{
@@ -72,13 +75,13 @@ func (ar AuthorizationRequest) GetRequest(base64Encode bool) (string, error) {
 			},
 			SAMLP:      "urn:oasis:names:tc:SAML:2.0:protocol",
 			Comparison: "exact",
-		},
-		AuthnContextClassRef: AuthnContextClassRef{
-			XMLName: xml.Name{
-				Local: "saml:AuthnContextClassRef",
+			AuthnContextClassRef: AuthnContextClassRef{
+				XMLName: xml.Name{
+					Local: "saml:AuthnContextClassRef",
+				},
+				SAML:      "urn:oasis:names:tc:SAML:2.0:assertion",
+				Transport: "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
 			},
-			SAML:      "urn:oasis:names:tc:SAML:2.0:assertion",
-			Transport: "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
 		},
 	}
 	b, err := xml.MarshalIndent(d, "", "    ")
@@ -135,14 +138,15 @@ func (ar AuthorizationRequest) GetSignedRequest(base64Encode bool, publicCert st
 			},
 			SAMLP:      "urn:oasis:names:tc:SAML:2.0:protocol",
 			Comparison: "exact",
-		},
-		AuthnContextClassRef: AuthnContextClassRef{
-			XMLName: xml.Name{
-				Local: "saml:AuthnContextClassRef",
+			AuthnContextClassRef: AuthnContextClassRef{
+				XMLName: xml.Name{
+					Local: "saml:AuthnContextClassRef",
+				},
+				SAML:      "urn:oasis:names:tc:SAML:2.0:assertion",
+				Transport: "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
 			},
-			SAML:      "urn:oasis:names:tc:SAML:2.0:assertion",
-			Transport: "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
 		},
+
 		Signature: Signature{
 			XMLName: xml.Name{
 				Local: "samlsig:Signature",
@@ -206,7 +210,7 @@ func (ar AuthorizationRequest) GetSignedRequest(base64Encode bool, publicCert st
 					XMLName: xml.Name{
 						Local: "samlsig:X509Data",
 					},
-					X509Certificate: X509Certificate {
+					X509Certificate: X509Certificate{
 						XMLName: xml.Name{
 							Local: "samlsig:X509Certificate",
 						},
@@ -242,9 +246,9 @@ func (ar AuthorizationRequest) GetSignedRequest(base64Encode bool, publicCert st
 	_, errOut := exec.Command("xmlsec1", "--sign", "--privkey-pem", privateCert,
 		"--id-attr:ID", "urn:oasis:names:tc:SAML:2.0:protocol:AuthnRequest",
 		"--output", samlXmlsecOutput.Name(), samlXmlsecInput.Name()).Output()
-    if errOut != nil {
-        return "", errOut
-    }
+	if errOut != nil {
+		return "", errOut
+	}
 
 	samlSignedRequest, err := ioutil.ReadFile(samlXmlsecOutput.Name())
 	if err != nil {
