@@ -4,39 +4,37 @@ import (
 	"encoding/base64"
 	"encoding/xml"
 	"errors"
-	"fmt"
-
 	"time"
 )
 
-/*
-type Response struct {
-	XmlDoc      string
-	Settings    AccountSettings
-	certificate x509.Certificate
-}
-*/
-
-func Parse(resp string, appSettings *AppSettings, accountSettings *AccountSettings) (Response, error) {
+func Parse(resp string, appSettings *AppSettings, accountSettings *AccountSettings) (map[string]string, error) {
 	x := Response{}
+	rtn := make(map[string]string)
 	decode, err := base64.StdEncoding.DecodeString(resp)
 	if err != nil {
-		fmt.Println(err)
+		return rtn, err
 	}
 
 	err = xml.Unmarshal(decode, &x)
 	if err != nil {
-		return Response{}, err
+		return rtn, err
 	}
 
 	err = VerifySignature(string(decode), "cert.crt")
 	if err != nil {
-		return Response{}, err
+		return rtn, err
 	}
 
 	err = IsValid(&x, appSettings, accountSettings)
-	fmt.Println(x)
-	return x, err
+	if err != nil {
+		return rtn, err
+	}
+
+	for _, attr := range x.Assertion.AttributeStatement.Attributes {
+		rtn[attr.FriendlyName] = attr.Value
+	}
+
+	return rtn, err
 
 }
 

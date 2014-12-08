@@ -62,19 +62,20 @@ type StatusCode struct {
 	Value string `xml:"Value"`
 }
 
-type AttributeStatement struct {
-	Attributes []Attribute
-}
-
-type Attribute struct {
-	XMLName        xml.Name
-	Name           string `xml:",attr"`
-	FriendlyName   string `xml:",attr"`
-	NameFormat     string `xml:",attr"`
-	AttributeValue AttributeValue
-}
-
+/*
 type AttributeValue struct {
 	XMLName xml.Name
-	Value   string `xml:"Value"`
+	Value   string `xml:","`
+}
+*/
+
+type Attribute struct {
+	Name         string `xml:",attr"`
+	FriendlyName string `xml:",attr"`
+	//NameFormat     string `xml:",attr"`
+	Value string `xml:"AttributeValue"`
+}
+
+type AttributeStatement struct {
+	Attributes []Attribute `xml:"Attribute"`
 }
