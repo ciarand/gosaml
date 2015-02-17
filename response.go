@@ -20,7 +20,7 @@ func Parse(resp string, appSettings *AppSettings, accountSettings *AccountSettin
 		return rtn, err
 	}
 
-	err = VerifySignature(string(decode), "cert.crt")
+	err = VerifySignature(string(decode), accountSettings.Certificate)
 	if err != nil {
 		return rtn, err
 	}

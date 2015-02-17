@@ -2,6 +2,7 @@ package saml
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -17,11 +18,12 @@ func VerifySignature(xml string, pubCertPath string) error {
 	samlXmlsecInput.WriteString(xml)
 	samlXmlsecInput.Close()
 
-	_, isSigned := exec.Command("e:\\xmlsec\\xmlsec.exe", "--verify", "--pubkey-cert-pem", pubCertPath, "--id-attr:ID", "urn:oasis:names:tc:SAML:2.0:protocol:Response", samlXmlsecInput.Name()).Output()
+	_, isSigned := exec.Command("xmlsec", "--verify", "--pubkey-cert-pem", pubCertPath, "--id-attr:ID", "urn:oasis:names:tc:SAML:2.0:protocol:Response", samlXmlsecInput.Name()).Output()
 
 	if isSigned == nil {
 		return nil
 	} else {
+		fmt.Println(isSigned)
 		return errors.New("error verifing signature.")
 	}
 }

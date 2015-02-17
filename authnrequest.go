@@ -283,10 +283,10 @@ func (ar AuthorizationRequest) GetRequestUrl() (string, error) {
 	return u.String(), nil
 }
 
-func NewAccountSettings(cert string, targetUrl string) *AccountSettings {
-	return &AccountSettings{cert, targetUrl}
+func NewAccountSettings(cert string, targetUrl string) AccountSettings {
+	return AccountSettings{cert, targetUrl}
 }
 
-func NewAppSettings(assertionServiceUrl string, issuer string) *AppSettings {
-	return &AppSettings{assertionServiceUrl, issuer}
+func NewAppSettings(assertionServiceUrl string, issuer string) AppSettings {
+	return AppSettings{assertionServiceUrl, issuer}
 }
