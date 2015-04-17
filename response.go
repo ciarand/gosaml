@@ -31,7 +31,11 @@ func Parse(resp string, appSettings *AppSettings, accountSettings *AccountSettin
 	}
 
 	for _, attr := range x.Assertion.AttributeStatement.Attributes {
-		rtn[attr.FriendlyName] = attr.Value
+		rtn[attr.Name] = attr.Value
+
+		if attr.FriendlyName != "" {
+			rtn[attr.FriendlyName] = attr.Value
+		}
 	}
 
 	return rtn, err
