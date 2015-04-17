@@ -18,7 +18,7 @@ func VerifySignature(xml string, pubCertPath string) error {
 	samlXmlsecInput.WriteString(xml)
 	samlXmlsecInput.Close()
 
-	_, isSigned := exec.Command("xmlsec", "--verify", "--pubkey-cert-pem", pubCertPath, "--id-attr:ID", "urn:oasis:names:tc:SAML:2.0:protocol:Response", samlXmlsecInput.Name()).Output()
+	_, isSigned := exec.Command("xmlsec1", "--verify", "--pubkey-cert-pem", pubCertPath, "--id-attr:ID", "urn:oasis:names:tc:SAML:2.0:protocol:Response", samlXmlsecInput.Name()).Output()
 
 	if isSigned == nil {
 		return nil
