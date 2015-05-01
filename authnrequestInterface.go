@@ -156,13 +156,3 @@ type Transform struct {
 	XMLName   xml.Name
 	Algorithm string `xml:"Algorithm,attr"`
 }
-
-type AccountSettings struct {
-	Certificate        string
-	IDP_SSO_Target_URL string
-}
-
-type AppSettings struct {
-	AssertionConsumerServiceURL string
-	Issuer                      string
-}

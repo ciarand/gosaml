@@ -18,13 +18,14 @@ import (
 	"encoding/base64"
 	"encoding/xml"
 	"fmt"
-	"github.com/nu7hatch/gouuid"
 	"io/ioutil"
 	"net/url"
 	"os"
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/nu7hatch/gouuid"
 )
 
 func NewAuthorizationRequest(appSettings AppSettings, accountSettings AccountSettings) *AuthorizationRequest {
@@ -281,12 +282,4 @@ func (ar AuthorizationRequest) GetRequestUrl() (string, error) {
 
 	u.RawQuery = q.Encode()
 	return u.String(), nil
-}
-
-func NewAccountSettings(cert string, targetUrl string) AccountSettings {
-	return AccountSettings{cert, targetUrl}
-}
-
-func NewAppSettings(assertionServiceUrl string, issuer string) AppSettings {
-	return AppSettings{assertionServiceUrl, issuer}
 }
