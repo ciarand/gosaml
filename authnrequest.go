@@ -123,7 +123,7 @@ func (ar AuthorizationRequest) GetSignedRequest(base64Encode bool, publicCert st
 			XMLName: xml.Name{
 				Local: "saml:Issuer",
 			},
-			Url: "https://sp.example.com/SAML2",
+			Url: ar.AppSettings.AssertionConsumerServiceURL,
 		},
 		IssueInstant: ar.IssueInstant,
 		NameIDPolicy: NameIDPolicy{
